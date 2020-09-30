@@ -1,0 +1,6 @@
+t3n\MailJetAdapter\Service\MailJetService:
+  properties:
+    client:
+      object:
+        factoryObjectName: t3n\MailJetAdapter\Factory\MailJetFactory
+        factoryMethodName: createClient

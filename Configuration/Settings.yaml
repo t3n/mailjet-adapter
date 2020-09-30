@@ -1,0 +1,9 @@
+
+t3n:
+  MailJetAdapter:
+    mailjet:
+      clientConfiguration:
+        apiKey: "some-key"
+        apiSecret: "some-secret"
+        apiVersion: "v3"
+        liveMode: false
