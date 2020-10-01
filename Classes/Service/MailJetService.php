@@ -83,6 +83,8 @@ class MailJetService
         $contact->getContactData()->map(static function (ContactData $data) use (&$mappedData): void {
             if (is_bool($data->getValue())) {
                 $value = $data->getValue() === true ? 'true' : 'false';
+            } elseif ($data->getValue() instanceof \DateTimeInterface) {
+                $value = $data->getValue()->format(DATE_ATOM);
             } else {
                 $value = (string) $data->getValue();
             }
