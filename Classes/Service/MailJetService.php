@@ -151,6 +151,20 @@ class MailJetService
         return $this->parseResult($response)['count'] === 1;
     }
 
+    public function getSubscribedListIdsForContact(Contact $contact): array
+    {
+        $response = $this->client->get(Resources::$ContactGetcontactslists, ['id' => $contact->getIdentifier()]);
+        $result = $this->parseResult($response);
+
+        $ids = [];
+
+        foreach ($result['data'] as $data) {
+            $ids[] = (int)$data['ListID'];
+        }
+
+        return $ids;
+    }
+
     protected function fetchContact(string $identifier, bool $includeAttributes): ?Contact
     {
         $response = $this->client->get(Resources::$Contact, ['id' => $identifier]);
