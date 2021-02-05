@@ -13,6 +13,7 @@ use Neos\Flow\Property\PropertyMapper;
 use Neos\Flow\Property\PropertyMappingConfiguration;
 use Neos\Flow\Property\TypeConverter\DateTimeConverter;
 use Neos\Flow\Reflection\ReflectionService;
+use t3n\MailJetAdapter\Exception\InvalidManageListActionException;
 use t3n\MailJetAdapter\Exception\MailJetInvalidContactDataException;
 use t3n\MailJetAdapter\Exception\MailJetRequestException;
 use t3n\MailJetAdapter\Model\Contact;
@@ -50,6 +51,8 @@ class MailJetService
     protected $runtimeCache = ['contactData' => null];
 
     protected $allowedContactMetaDataTypes = ['str', 'datetime', 'int', 'float', 'bool'];
+
+    protected $allowedManageContactListActions = ['addnoforce', 'addforce', 'remove', 'unsub'];
 
     public function getContactByEmail(MailJetContactEmail $email, bool $includeAttributes): ?Contact
     {
@@ -122,6 +125,30 @@ class MailJetService
         }
 
         return $this->runtimeCache['contactData'];
+    }
+
+    public function manageContactListForContact(Contact $contact, int $listId, string $action = 'addnoforce'): bool
+    {
+        if (!in_array($action, $this->allowedManageContactListActions)) {
+            throw new InvalidManageListActionException(
+                sprintf(
+                    'Action %s is not a valid action to manage contact lists!
+                    Allowed actions are: %s',
+                    $action,
+                    implode(', ', $this->allowedManageContactListActions)
+                )
+            );
+        }
+
+        $response = $this->client->post(
+            Resources::$ContactManagecontactslists,
+            [
+                'id' => $contact->getIdentifier(),
+                'body' => ['ContactsLists' => [['Action' => $action, 'ListId' => $listId]]],
+            ]
+        );
+
+        return $this->parseResult($response)['count'] === 1;
     }
 
     protected function fetchContact(string $identifier, bool $includeAttributes): ?Contact
