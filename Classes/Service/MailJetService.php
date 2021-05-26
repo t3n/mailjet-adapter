@@ -68,7 +68,7 @@ class MailJetService
     {
         $response = $this->client->post(Resources::$Contact, ['body' => ['Name' => $name, 'Email' => (string) $email]]);
 
-        if ($response->getStatus() !== 200) {
+        if ($response->getStatus() !== 200 && $response->getStatus() !== 201 && $response->getStatus() !== 204) {
             throw new MailJetInvalidContactDataException(json_encode($response->getBody()));
         }
 
