@@ -67,6 +67,11 @@ class MailJetService
     public function addNewContact(MailJetContactEmail $email, string $name): Contact
     {
         $response = $this->client->post(Resources::$Contact, ['body' => ['Name' => $name, 'Email' => (string) $email]]);
+
+        if ($response->getStatus() !== 200) {
+            throw new MailJetInvalidContactDataException(json_encode($response->getBody()));
+        }
+
         $result = $this->parseResult($response);
 
         return $this->createContactFromRawData($result['data'][0]);
